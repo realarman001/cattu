@@ -3,6 +3,10 @@ from discord.ext import commands, tasks
 import os
 from datetime import datetime, timedelta
 
+# For local .env support
+from dotenv import load_dotenv
+load_dotenv()
+
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 intents = discord.Intents.default()
@@ -26,10 +30,7 @@ async def on_ready():
 
 @bot.command()
 async def remindme(ctx, time: int, *, message: str):
-    """
-    Set a reminder in minutes.
-    Usage: !remindme <minutes> <message>
-    """
+    """Set a reminder in minutes. Usage: !remindme <minutes> <message>"""
     remind_at = datetime.utcnow() + timedelta(minutes=time)
     reminders.append(Reminder(ctx.author.id, message, remind_at))
     await ctx.send(f"⏰ Reminder set for {time} minutes from now!")
@@ -52,22 +53,5 @@ async def reminder_task():
     for r in to_remove:
         reminders.remove(r)
 
-# Railway keepalive: simple web server using Flask
-from flask import Flask
-
-app = Flask(__name__)
-
-@app.route("/")
-def home():
-    return "Discord Reminder Bot is running!"
-
 if __name__ == "__main__":
-    import threading
-
-    def run_flask():
-        app.run(host="0.0.0.0", port=int(os.getenv("PORT", 8080)))
-    
-    flask_thread = threading.Thread(target=run_flask)
-    flask_thread.start()
-
     bot.run(TOKEN)
