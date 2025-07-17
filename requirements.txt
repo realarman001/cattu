@@ -1,0 +1,3 @@
+discord.py
+Flask
+python-dotenv==1.0.1
